@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/secondarykey/xbox"
 )
 
 func main() {
-	xbox.HandlerFunc(printButton)
-	xbox.Listen(0)
+	xbox.HandleFunc(printButton)
+	err := xbox.Listen(0)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func printButton(e xbox.Event) error {
@@ -38,7 +42,7 @@ func printButton(e xbox.Event) error {
 		fmt.Println("START Button")
 	}
 	if e.Buttons[xbox.XBOX] {
-		fmt.Println("XBOX Button")
+		return fmt.Errorf("XBOX Button Escape.")
 	}
 	if e.Buttons[xbox.JOY_R] {
 		fmt.Println("Right joystick Button")
