@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/secondarykey/xbox"
+	"github.com/ikascrew/xbox"
 )
 
 func main() {
@@ -41,40 +41,12 @@ func printButton(e xbox.Event) error {
 	if e.Buttons[xbox.START] {
 		fmt.Println("START Button")
 	}
-	if e.Buttons[xbox.XBOX] {
-		return fmt.Errorf("XBOX Button Escape.")
-	}
-	if e.Buttons[xbox.JOY_R] {
-		fmt.Println("Right joystick Button")
-	}
-	if e.Buttons[xbox.JOY_L] {
-		fmt.Println("Left joystick Button")
-	}
-
-	if xbox.JudgeAxis(e, xbox.R2) {
-		fmt.Printf("R2 Button[%d]\n", e.Axes[xbox.R2])
-	}
-	if xbox.JudgeAxis(e, xbox.L2) {
-		fmt.Printf("L2 Button[%d]\n", e.Axes[xbox.L2])
-	}
-	if xbox.JudgeAxis(e, xbox.JOY_L_HORIZONTAL) {
-		fmt.Printf("Left Joy stick horizontal Button[%d]\n", e.Axes[xbox.JOY_L_HORIZONTAL])
-	}
-	if xbox.JudgeAxis(e, xbox.JOY_L_VERTICAL) {
-		fmt.Printf("Left Joy stick vertical Button[%d]\n", e.Axes[xbox.JOY_L_VERTICAL])
-	}
-	if xbox.JudgeAxis(e, xbox.JOY_R_HORIZONTAL) {
-		fmt.Printf("Right Joy stick horizontal Button[%d]\n", e.Axes[xbox.JOY_R_HORIZONTAL])
-	}
-	if xbox.JudgeAxis(e, xbox.JOY_R_VERTICAL) {
-		fmt.Printf("Right Joy stick vertical Button[%d]\n", e.Axes[xbox.JOY_R_VERTICAL])
-	}
 
 	if xbox.JudgeAxis(e, xbox.CROSS_HORIZONTAL) {
-		fmt.Printf("Right Joy stick horizontal Button[%d]\n", e.Axes[xbox.CROSS_HORIZONTAL])
+		fmt.Printf("cross button horizontal Button[%d]\n", e.Axes[xbox.CROSS_HORIZONTAL])
 	}
 	if xbox.JudgeAxis(e, xbox.CROSS_VERTICAL) {
-		fmt.Printf("Right Joy stick vertical Button[%d]\n", e.Axes[xbox.CROSS_VERTICAL])
+		fmt.Printf("cross button vertical Button[%d]\n", e.Axes[xbox.CROSS_VERTICAL])
 	}
 
 	return nil
