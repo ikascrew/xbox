@@ -11,7 +11,7 @@ var duration time.Duration
 var handler func(Event) error
 
 func init() {
-	duration = time.Duration(50)
+	SetDuration(100)
 	handler = nil
 }
 
@@ -24,26 +24,38 @@ func HandleFunc(fn func(Event) error) error {
 	return nil
 }
 
+func Open(jsId int) (Event, error) {
+	js, err := joystick.Open(jsId)
+	if err != nil {
+		return Event{}, fmt.Errorf("Joystick open error.[%v]", err)
+	}
+	e := Event{}
+	e.Buttons = make([]bool, js.ButtonCount())
+	e.Axes = make([]int, js.AxisCount())
+
+	fmt.Printf("Button:%d\n", js.ButtonCount())
+	fmt.Printf("Axes:%d\n", js.AxisCount())
+
+	e.js = js
+	return e, nil
+}
+
 func Listen(jsId int) error {
 
 	if handler == nil {
 		return fmt.Errorf("Call HandleFunc()")
 	}
 
-	js, err := joystick.Open(jsId)
+	e, err := Open(jsId)
 	if err != nil {
 		return fmt.Errorf("Joystick open error.[%v]", err)
 	}
-
-	e := Event{}
-	e.Buttons = make([]bool, js.ButtonCount())
-	e.Axes = make([]int, js.AxisCount())
 
 	ticker := time.NewTicker(time.Millisecond * duration)
 	for doQuit := false; !doQuit; {
 		select {
 		case <-ticker.C:
-			err = read(js, e)
+			err = read(e)
 			if err != nil {
 				return err
 			}
