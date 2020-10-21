@@ -52,9 +52,9 @@ for {
 
 現状あるオプションは以下です。
 
-controller.Duration(50)  -> 内部のループTickerのミリ秒
-controller.RapidFire(false) -> ボタンを押し続けた場合のイベント有無
-controller.AxisMargin(2000)  -> ジョイスティックの０値のマージン 
-controller.Logger(log.New()) -> 内部ログの設定
+- controller.Duration(50)  -> 内部のループTickerのミリ秒
+- controller.RapidFire(false) -> ボタンを押し続けた場合のイベント有無
+- controller.AxisMargin(2000)  -> ジョイスティックの０値のマージン 
+- controller.Logger(log.New()) -> 内部ログの設定
 
 controller.New()に引数で渡せます
