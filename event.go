@@ -2,84 +2,42 @@ package xbox
 
 import (
 	"fmt"
-
-	"github.com/simulatedsimian/joystick"
+	"strings"
 )
 
 type Event struct {
-	Buttons []bool
-	Axes    []int
-	js      joystick.Joystick
+	Buttons []*Button
+	Axes    []*Axis
+
+	error error
 }
 
-type Button int
+func (e *Event) Push() bool {
+	if e.error != nil {
+		return true
+	}
 
-const (
-	A = Button(iota)
-	B
-	X
-	Y
-	L1
-	R1
-	BACK
-	START
-)
-
-type Axis int
-
-const (
-	CROSS_HORIZONTAL = Axis(iota)
-	CROSS_VERTICAL
-)
-
-func JudgeAxis(e Event, axis Axis) bool {
-	if e.Axes[axis] != 0 {
+	if len(e.Buttons) > 0 || len(e.Axes) > 0 {
 		return true
 	}
 	return false
 }
 
-func (e Event) GetEvent() (Event, error) {
-
-	jinfo, err := e.js.Read()
-	if err != nil {
-		return Event{}, err
-	}
-
-	for button := 0; button < e.js.ButtonCount(); button++ {
-		if jinfo.Buttons&(1<<uint32(button)) != 0 {
-			e.Buttons[button] = true
-		} else {
-			e.Buttons[button] = false
-		}
-	}
-
-	for axis := 0; axis < e.js.AxisCount(); axis++ {
-		e.Axes[axis] = jinfo.AxisData[axis]
-	}
-	return e, nil
+func (e *Event) Error() error {
+	return e.error
 }
 
-func read(e Event) error {
+func (e *Event) String() string {
 
-	js := e.js
+	var buf strings.Builder
 
-	jinfo, err := js.Read()
-	if err != nil {
-		return fmt.Errorf("Joystick read error[%v]", err)
+	for _, elm := range e.Buttons {
+		fmt.Fprintf(&buf, "Push [%s]\n", elm.Name)
 	}
 
-	for button := 0; button < js.ButtonCount(); button++ {
-		if jinfo.Buttons&(1<<uint32(button)) != 0 {
-			e.Buttons[button] = true
-		} else {
-			e.Buttons[button] = false
-		}
+	for _, elm := range e.Axes {
+		fmt.Fprintf(&buf, "Axis [%s][%d]\n", elm.Name, elm.Value)
 	}
 
-	for axis := 0; axis < js.AxisCount(); axis++ {
-		e.Axes[axis] = jinfo.AxisData[axis]
-	}
-
-	return handler(e)
+	return buf.String()
 }

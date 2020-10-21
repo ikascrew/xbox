@@ -3,51 +3,86 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/ikascrew/xbox"
 )
 
 func main() {
-	xbox.HandleFunc(printButton)
-	err := xbox.Listen(0)
+
+	err := run()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("%+v\n", err)
+		os.Exit(1)
 	}
+
+	fmt.Println("success")
 }
 
-func printButton(e xbox.Event) error {
+func run() error {
 
-	if e.Buttons[xbox.A] {
-		fmt.Println("A Button")
-	}
-	if e.Buttons[xbox.B] {
-		fmt.Println("B Button")
-	}
-	if e.Buttons[xbox.Y] {
-		fmt.Println("Y Button")
-	}
-	if e.Buttons[xbox.X] {
-		fmt.Println("X Button")
-	}
-	if e.Buttons[xbox.L1] {
-		fmt.Println("L1 Button")
-	}
-	if e.Buttons[xbox.R1] {
-		fmt.Println("R1 Button")
-	}
-	if e.Buttons[xbox.BACK] {
-		fmt.Println("Back Button")
-	}
-	if e.Buttons[xbox.START] {
-		fmt.Println("START Button")
+	c, err := createController(0)
+	if err != nil {
+		return err
 	}
 
-	if xbox.JudgeAxis(e, xbox.CROSS_HORIZONTAL) {
-		fmt.Printf("cross button horizontal Button[%d]\n", e.Axes[xbox.CROSS_HORIZONTAL])
-	}
-	if xbox.JudgeAxis(e, xbox.CROSS_VERTICAL) {
-		fmt.Printf("cross button vertical Button[%d]\n", e.Axes[xbox.CROSS_VERTICAL])
+	ch := c.Event()
+	for {
+		select {
+		case ev := <-ch:
+			if ev.Error() != nil {
+				fmt.Printf("%+v\n", ev.Error())
+				c.Terminate()
+			} else {
+				fmt.Print(ev)
+			}
+		default:
+		}
+
+		if c.Closed() {
+			break
+		}
 	}
 
 	return nil
+}
+
+const (
+	Button10Axis7 = true
+	Button8Axis2  = false
+)
+
+func createController(id int) (*xbox.Controller, error) {
+
+	c, err := xbox.New(id,
+		xbox.Logger(log.New(os.Stdout, "[XBOX]", log.LstdFlags|log.Lshortfile)),
+		xbox.Duration(40),
+		xbox.AxisMargin(3000),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if Button10Axis7 {
+		err = c.ButtonNames("A", "B", "X", "Y", "L", "R", "BACK", "START", "L_JOY", "R_JOY")
+		if err != nil {
+			return nil, err
+		}
+
+		err = c.AxisNames("LEFT_JOY_H", "LEFT_JOY_V", "ZLR", "RIGHT_JOY_V", "RIGHT_JOY_H", "CROSS_H", "CROSS_V")
+		if err != nil {
+			return nil, err
+		}
+	} else if Button8Axis2 {
+		err = c.ButtonNames("A", "B", "X", "Y", "L", "R", "BACK", "START")
+		if err != nil {
+			return nil, err
+		}
+		err = c.AxisNames("CROSS_H", "CROSS_V")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return c, nil
 }
