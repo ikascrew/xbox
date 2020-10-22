@@ -12,7 +12,7 @@ type Event struct {
 	error error
 }
 
-func (e *Event) Push() bool {
+func (e *Event) push() bool {
 	if e.error != nil {
 		return true
 	}

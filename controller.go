@@ -107,7 +107,7 @@ func (c *Controller) Event() chan *Event {
 					e.error = err
 				}
 
-				if e.Push() {
+				if e.push() {
 					c.ev <- &e
 				}
 			case <-c.stop:
